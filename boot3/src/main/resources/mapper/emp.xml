@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.micol.demo.EmpMapper">
+	<select id="getEmp" parameterType="String" resultType="com.micol.demo.EmpVO" >
+	select * from employees
+	where employee_id = #{employeeId}
+	</select>
+<insert id="insertEmp" parameterType="com.micol.demo.EmpVO" >
+	insert into employees (
+			employee_id,
+			first_name,
+			last_name,
+			email,
+			hire_date,
+			job_id
+	) values (
+			#{employeeId},
+			#{firstName},
+			#{lastName},
+			#{email},
+			#{hireDate},
+			#{jobId}
+	)
+</insert>
+
+<insert id="deleteEmp" parameterType="String">
+	delete from employees
+	where employee_id = #{employeeId}
+</insert>
+
+<update id="updateEmp" parameterType="com.micol.demo.EmpVO">
+	update employees
+	   set first_name = #{firstName},
+		   last_name = #{lastName},
+		   email = #{email},
+		   phone_number = #{phoneNumber},
+		   job_id = #{jobId},	
+		   salary = #{salary}    
+	where employee_id = #{employeeId}
+</update>
+
+
+<!-- 조인 할때는 vo대신ㅇ데 map쓰는게 편한 -->
+	<select id="getJobList" resultType="map">
+	select job_id "jobId", job_title "jobTitle" 
+	from jobs 
+	ORDER BY job_id
+	</select>
+	
+<!-- 반드시 null유무 체크와 함께 nullString 체크도 해줘야함  -->
+	<!-- 여러번 사용할 sql문으 따로 빼서 id를 가지고 사용 -->
+	<sql id="creiteria">
+		<where>
+			<if test="departmentId != null and departmentId != ''">
+			department_id = #{departmentId}
+			</if>
+			<if test="jobId !=null and jobId != ''">
+			and job_id =#{jobId}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="getEmpList" parameterType="EmpSearchVO" resultType="EmpVO">
+		SELECT * FROM( SELECT ROWNUM RN, A.* FROM(
+			SELECT * 
+			FROM EMPLOYEES 
+			<include refid="creiteria"></include>
+			ORDER BY FIRST_NAME
+		<![CDATA[
+		) A  WHERE ROWNUM <= #{last} ) B WHERE RN >= #{first}
+		]]>
+	</select>
+	
+	<select id="getcountTotal" resultType="int" parameterType="EmpSearchVO">
+		select count(*) 
+		from employees
+		<include refid="creiteria"></include>
+	</select>
+
+</mapper>
