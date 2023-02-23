@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorate="~{layout}"
+>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<th:block layout:fragment="header">  <!-- 얘를 헤드에 넣고싶음 -->
+<style>
+	.green{ background-color: red;}
+</style>
+<script ></script>
+</th:block>
+</head>
+<body>
+<div layout:fragment="content">
+[[${paging }]]<br>
+시작 페이지 [[${paging.startPage}]] <br>
+마지막 페이지 [[${paging.endPage}]] 
+<hr>
+[[${jobList[0]}]]
+<hr>
+<script>
+function gopage(page){
+	//location.href="empList?page="+page;  //get방식
+	frmSearch.page.value = page;
+	frmSearch.submit();
+}
+</script>
+<form name="frmSearch">
+<input type="hidden" name="page" value="1">
+<select name="jobId" >
+<option value="">선택
+<option th:each="job:${jobList}" 
+th:text="${job.jobTitle}" th:value="${job.jobId}"
+th:selected="${job.jobId}==${esvo.jobId}">
+</select> 
+<input name="departmentId" th:value="${esvo.departmentId}">
+<button>검색</button>
+<button>초기화</button>
+
+</form>
+
+<!-- | |이거는 백틱과 같음! -->
+<div>
+	<a 
+	th:each="num: *{#numbers.sequence(paging.startPage, paging.endPage)}"
+	th:href="|javascript:gopage(${num})|" 
+	th:class="${paging.page}==${num}?'active'"> [[${num}]] </a>
+</div>
+<hr>
+ 총사원수 <span th:text="${#lists.size(empList)}"></span>
+ 총사원수 [[${#lists.size(empList)}]]
+<table>
+ <tr>
+ <th>▶empStat.count </th>
+ <th>▶employee_id </th>
+ <th>▶first_name </th>
+ <th>▶last_name </th>
+ <th>▶부서 </th>
+ <th>▶직무 </th>
+ 
+ <th>▶salary </th>
+ <th>▶hire_date </th>
+ </tr> <tr th:each="emp : ${empList}" th:class="${empStat.even ? 'green' : ''}">
+ <td th:text="${empStat.count}"></td>
+ <td th:text="${emp.employeeId}"></td>
+ <td th:text="${emp.firstName}"></td>
+ <td th:text="${emp.lastName}"></td>
+ <td th:text="${emp.departmentId}"></td>
+ <td th:text="${emp.jobId}"></td>
+ 
+ <td th:text="${emp.salary}"></td>
+ 
+ <td th:text="${#dates.format(emp.hireDate,'yyyy/mm/dd')}"></td>
+<td>
+<button th:if="${emp.salary}>4000">보너스</button>
+ </tr>
+</table>
+</div>
+<!--footer : 파일명  
+th:insert: 푸터 안에 삽입되는것 
+-->
+<footer th:insert="~{footer :: copy}"></footer>
+<!--replace : footer를 교체함  -->
+<!-- <footer th:replace="~{footer :: copy}"></footer> -->
+</body>
+</html>

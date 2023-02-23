@@ -1,6 +1,8 @@
 package com.micol.demo;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //import org.slf4j.Logger;
@@ -24,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Controller
 @Log4j2
-@CrossOrigin
+@CrossOrigin(value = "*")
 public class EmpController {
 	@Autowired EmpMapper empMapper;
 	
@@ -87,6 +89,20 @@ public class EmpController {
 		return vo;
 	}
 	
+	@PostMapping("/product")
+	@ResponseBody
+	public Map product(@RequestBody List<Map<String,Object>> list) {
+		System.out.println(list);
+		//넘겨주는 결과 
+		//맵인지, 보인지, 
+		//map으로 보내기 
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		map.put("result","success");
+		map.put("size", list.size());
+		map.put("list", list);
+	
+		return map;
+	}
 	
 	
 }
